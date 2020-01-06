@@ -34,28 +34,23 @@ public class DataSourceConfiguration {
 
     @Bean
     @Primary
-    @ConfigurationProperties("app.customer.jpa")
+    @ConfigurationProperties("spring.jpa")
     public JpaProperties customerJpaProperties() {
         return new JpaProperties();
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "app.customer.development.datasource")
+    @ConfigurationProperties(prefix = "spring.datasource.master")
     public DataSource customerDevelopmentDataSource() {
         return DataSourceBuilder.create().build();
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "app.customer.testing.datasource")
+    @ConfigurationProperties(prefix = "spring.datasource.slave")
     public DataSource customerTestingDataSource() {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean
-    @ConfigurationProperties(prefix = "app.customer.production.datasource")
-    public DataSource customerProductionDataSource() {
-        return DataSourceBuilder.create().build();
-    }
 
     /**
      * Adds all available datasources to datasource map.
@@ -71,8 +66,8 @@ public class DataSourceConfiguration {
         map.put(DatabaseEnvironment.DEVELOPMENT,
             customerDevelopmentDataSource());
         map.put(DatabaseEnvironment.TESTING, customerTestingDataSource());
-        map.put(DatabaseEnvironment.PRODUCTION, customerProductionDataSource());
         router.setTargetDataSources(map);
+        router.setDefaultTargetDataSource(customerTestingDataSource());
         return router;
     }
 
