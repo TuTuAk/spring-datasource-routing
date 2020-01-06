@@ -25,19 +25,8 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 
 @Configuration
-@EnableJpaRepositories(basePackageClasses = CustomerRepository.class, entityManagerFactoryRef = "customerEntityManager", transactionManagerRef = "customerTransactionManager")
-@EnableTransactionManagement
+
 public class DataSourceConfiguration {
-
-    @Autowired(required = false)
-    private PersistenceUnitManager persistenceUnitManager;
-
-    @Bean
-    @Primary
-    @ConfigurationProperties("spring.jpa")
-    public JpaProperties customerJpaProperties() {
-        return new JpaProperties();
-    }
 
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.master")
@@ -67,44 +56,8 @@ public class DataSourceConfiguration {
             customerDevelopmentDataSource());
         map.put(DatabaseEnvironment.TESTING, customerTestingDataSource());
         router.setTargetDataSources(map);
-        router.setDefaultTargetDataSource(customerTestingDataSource());
         return router;
     }
 
-    @Bean
-    @Primary
-    public LocalContainerEntityManagerFactoryBean customerEntityManager(
-        final JpaProperties customerJpaProperties) {
 
-        EntityManagerFactoryBuilder builder =
-            createEntityManagerFactoryBuilder(customerJpaProperties);
-
-        return builder.dataSource(customerDataSource()).packages(Customer.class)
-            .persistenceUnit("customerEntityManager").build();
-    }
-
-    @Bean
-    @Primary
-    public JpaTransactionManager customerTransactionManager(
-        @Qualifier("customerEntityManager") final EntityManagerFactory factory) {
-        return new JpaTransactionManager(factory);
-    }
-
-    private EntityManagerFactoryBuilder createEntityManagerFactoryBuilder(
-        JpaProperties customerJpaProperties) {
-        JpaVendorAdapter jpaVendorAdapter =
-            createJpaVendorAdapter(customerJpaProperties);
-        return new EntityManagerFactoryBuilder(jpaVendorAdapter,
-            customerJpaProperties.getProperties(), this.persistenceUnitManager);
-    }
-
-    private JpaVendorAdapter createJpaVendorAdapter(
-        JpaProperties jpaProperties) {
-        AbstractJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
-        adapter.setShowSql(jpaProperties.isShowSql());
-        adapter.setDatabase(jpaProperties.getDatabase());
-        adapter.setDatabasePlatform(jpaProperties.getDatabasePlatform());
-        adapter.setGenerateDdl(jpaProperties.isGenerateDdl());
-        return adapter;
-    }
 }
