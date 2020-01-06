@@ -1,0 +1,25 @@
+server:
+  port: 8880
+spring:
+  datasource:
+    master:
+      type: org.apache.tomcat.jdbc.pool.DataSource
+      url: jdbc:mysql://127.0.0.1:3306/microservice?useUnicode=true&characterEncoding=utf-8
+      username : root
+      password : root
+      driverClassName : com.mysql.jdbc.Driver
+    slave:
+      type: org.apache.tomcat.jdbc.pool.DataSource
+      url: jdbc:mysql://127.0.0.1:3306/microservice1
+      username: root
+      password: root
+      driverClassName: com.mysql.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: update
+    show-sql: true
+#    generate-ddl: true
